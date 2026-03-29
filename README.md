@@ -38,7 +38,10 @@ Settings: SprintFOVMultiplier = 0.17
 Player (Layer: Player)
 ├── CameraHolder (position: 0, 1.6, 0)
 │   └── Main Camera (position: 0, 0, 0)
+└── PlayerMesh (optional, position: 0, 0, 0)
 ```
+
+The mesh (capsule, character model, etc.) goes as a direct child of Player, not under CameraHolder — otherwise it rotates when looking up/down. Unity's default capsule (2m tall, pivot at center) aligns with the CharacterController out of the box. For custom meshes, make sure the feet sit at Y=0. In first person you won't see it, but it's useful for shadows and debug.
 
 ### Components on the Player GameObject
 
