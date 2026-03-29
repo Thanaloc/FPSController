@@ -1,0 +1,10 @@
+{
+  "name": "com.custom.fpscontroller",
+  "version": "1.0.0",
+  "displayName": "FPS Controller",
+  "description": "State machine-based first person controller with head bob, smooth crouch, and FOV shift.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.unity.inputsystem": "1.11.2"
+  }
+}
