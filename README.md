@@ -30,7 +30,7 @@ Recommended values:
 | Sprint | 10 | 2 | 1.6 | 16 | 0.02 |
 | Crouch | 3 | 1.2 | 0.8 | 6 | 0.005 |
 
-Settings: SprintFOVMultiplier = 0.17
+Settings: SprintFOVMultiplier = 0.17, JumpForce = 5
 
 ### Scene hierarchy
 
@@ -46,8 +46,8 @@ The mesh (capsule, character model, etc.) goes as a direct child of Player, not 
 ### Components on the Player GameObject
 
 - **CharacterController** (height: 2, center: 0/1/0)
-- **PlayerInputHandler** — assign your 4 InputActionReferences (Move, Look, Sprint, Crouch)
-- **PlayerMotor** — assign CharacterController, Camera, CameraHolder, CameraHeadBob, Settings
+- **PlayerInputHandler** — assign your 5 InputActionReferences (Move, Look, Sprint, Crouch, Jump)
+- **PlayerMotor** — assign CharacterController, Camera, CameraHolder, CameraHeadBob, Settings, PlayerInputHandler
 - **PlayerLook** — assign PlayerInputHandler, CameraHolder
 - **PlayerStateMachine** — assign PlayerMotor, PlayerInputHandler, and the 4 State Data assets
 - **CameraHeadBob** — assign CharacterController, PlayerStateMachine
@@ -59,6 +59,7 @@ The package uses `InputActionReference` fields, so it works with any InputAction
 - Look (Vector2)
 - Sprint (Button)
 - Crouch (Button)
+- Jump (Button)
 
 ## Hooking into state changes
 

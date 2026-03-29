@@ -7,5 +7,8 @@ namespace FPSController
     {
         [Header("Sprint")]
         public float SprintFOVMultiplier = 0.17f;
+
+        [Header("Jump")]
+        public float JumpForce = 5f;
     }
 }

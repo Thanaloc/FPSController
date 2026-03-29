@@ -9,6 +9,7 @@ namespace FPSController
         [SerializeField] private Transform _CameraHolder;
         [SerializeField] private CameraHeadBob _HeadBob;
         [SerializeField] private FPSControllerSettingsSO _Settings;
+        [SerializeField] private PlayerInputHandler _InputHandler;
 
         private float _verticalVelocity;
         private Vector3 _direction;
@@ -76,6 +77,9 @@ namespace FPSController
                 _verticalVelocity = -1f;
             else
                 _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+
+            if (_InputHandler.JumpPressed && IsGrounded())
+                _verticalVelocity = _Settings.JumpForce;
 
             _direction.y = _verticalVelocity;
         }
