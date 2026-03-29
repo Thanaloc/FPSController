@@ -87,13 +87,24 @@ namespace FPSController
 
         private void ApplyGravity()
         {
+            bool grounded = CheckGrounded();
+
             if (!_gravityEnabled)
             {
-                _direction.y = 0f;
+                if (_InputHandler.JumpPressed && grounded)
+                {
+                    _verticalVelocity = _Settings.JumpForce;
+                    _InputHandler.ConsumeJump();
+                }
+
+                if (_verticalVelocity > 0 || !grounded)
+                    _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+                else
+                    _verticalVelocity = 0f;
+
+                _direction.y = _verticalVelocity;
                 return;
             }
-
-            bool grounded = CheckGrounded();
 
             if (grounded && _verticalVelocity < 0)
                 _verticalVelocity = -1f;
