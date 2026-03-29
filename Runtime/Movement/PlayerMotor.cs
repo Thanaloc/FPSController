@@ -21,6 +21,8 @@ namespace FPSController
         private const float CAMERA_LERP_SPEED = 10f;
         private const float FOV_LERP_SPEED = 10f;
 
+        private bool _gravityEnabled = true;
+
         private void Awake()
         {
             _targetHeight = _CameraHolder.localPosition;
@@ -71,15 +73,38 @@ namespace FPSController
             return _CharacterController;
         }
 
+        public void SetGravityEnabled(bool enabled)
+        {
+            _gravityEnabled = enabled;
+            if (!enabled) _verticalVelocity = 0f;
+        }
+
+        private bool CheckGrounded()
+        {
+            return Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, 0.3f);
+        }
+
+
         private void ApplyGravity()
         {
-            if (IsGrounded() && _verticalVelocity < 0)
+            if (!_gravityEnabled)
+            {
+                _direction.y = 0f;
+                return;
+            }
+
+            bool grounded = CheckGrounded();
+
+            if (grounded && _verticalVelocity < 0)
                 _verticalVelocity = -1f;
             else
                 _verticalVelocity += Physics.gravity.y * Time.deltaTime;
 
-            if (_InputHandler.JumpPressed && IsGrounded())
+            if (_InputHandler.JumpPressed && grounded)
+            {
                 _verticalVelocity = _Settings.JumpForce;
+                _InputHandler.ConsumeJump();
+            }
 
             _direction.y = _verticalVelocity;
         }

@@ -82,5 +82,10 @@ namespace FPSController
         {
             JumpPressed = p_context.ReadValueAsButton();
         }
+
+        public void ConsumeJump()
+        {
+            JumpPressed = false;
+        }
     }
 }
