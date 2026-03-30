@@ -22,6 +22,7 @@ namespace FPSController
         private const float FOV_LERP_SPEED = 10f;
 
         private bool _gravityEnabled = true;
+        private bool _movementEnabled = true;
 
         private void Awake()
         {
@@ -40,6 +41,13 @@ namespace FPSController
 
         public void Move(Vector2 p_input, float p_speed)
         {
+            if (!_movementEnabled)
+            {
+                _direction.x = 0f;
+                _direction.z = 0f;
+                return;
+            }
+
             _direction = transform.right * p_input.x + transform.forward * p_input.y;
             _direction.x *= p_speed;
             _direction.z *= p_speed;
@@ -79,11 +87,20 @@ namespace FPSController
             if (!enabled) _verticalVelocity = 0f;
         }
 
+        public void SetMovementEnabled(bool enabled)
+        {
+            _movementEnabled = enabled;
+            if (!enabled)
+            {
+                _direction.x = 0f;
+                _direction.z = 0f;
+            }
+        }
+
         private bool CheckGrounded()
         {
             return Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, 0.3f);
         }
-
 
         private void ApplyGravity()
         {
