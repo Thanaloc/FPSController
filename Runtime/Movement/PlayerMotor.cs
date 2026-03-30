@@ -23,6 +23,7 @@ namespace FPSController
 
         private bool _gravityEnabled = true;
         private bool _movementEnabled = true;
+        private bool _jumpEnabled = true;
 
         private void Awake()
         {
@@ -97,6 +98,16 @@ namespace FPSController
             }
         }
 
+        public void SetJumpEnabled(bool enabled)
+        {
+            _jumpEnabled = enabled;
+        }
+
+        public void SetHeadBobEnabled(bool enabled)
+        {
+            _HeadBob.enabled = enabled;
+        }
+
         private bool CheckGrounded()
         {
             return Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, 0.3f);
@@ -108,7 +119,7 @@ namespace FPSController
 
             if (!_gravityEnabled)
             {
-                if (_InputHandler.JumpPressed && grounded)
+                if (_jumpEnabled && _InputHandler.JumpPressed && grounded)
                 {
                     _verticalVelocity = _Settings.JumpForce;
                     _InputHandler.ConsumeJump();
@@ -128,7 +139,7 @@ namespace FPSController
             else
                 _verticalVelocity += Physics.gravity.y * Time.deltaTime;
 
-            if (_InputHandler.JumpPressed && grounded)
+            if (_jumpEnabled && _InputHandler.JumpPressed && grounded)
             {
                 _verticalVelocity = _Settings.JumpForce;
                 _InputHandler.ConsumeJump();
@@ -139,6 +150,9 @@ namespace FPSController
 
         private void ApplyMovement()
         {
+            if (!_CharacterController.enabled)
+                return;
+
             _CharacterController.Move(_direction * Time.deltaTime);
             _direction.x = _direction.z = 0f;
         }
