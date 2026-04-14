@@ -128,7 +128,7 @@ namespace FPSController
 
             Vector3 direction = transform.right * p_input.x + transform.forward * p_input.y;
 
-            float speedMultiplier = _isGrounded ? 1f : _Settings.AirControlMultiplier;
+            float speedMultiplier = _coyoteTimer > 0f ? 1f : _Settings.AirControlMultiplier;
 
             _targetHorizontalVelocity = direction * (p_speed * speedMultiplier);
         }
@@ -206,7 +206,7 @@ namespace FPSController
 
             if (_isGrounded && _verticalVelocity < 0f)
             {
-                _verticalVelocity = -1f;
+                _verticalVelocity = -5f;
             }
             else
             {
