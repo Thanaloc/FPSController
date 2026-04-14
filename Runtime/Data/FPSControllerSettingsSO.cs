@@ -18,5 +18,11 @@ namespace FPSController
         [Header("Air")]
         [Range(0f, 1f)]
         public float AirControlMultiplier = 0.4f;
+
+        [Header("Gravity")]
+        [Tooltip("Gravity multiplier while falling. Higher = snappier descent.")]
+        public float FallGravityMultiplier = 2.2f;
+        [Tooltip("Gravity multiplier when jump is released early. Enables variable jump height.")]
+        public float LowJumpGravityMultiplier = 3f;
     }
 }

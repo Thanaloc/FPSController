@@ -28,7 +28,6 @@ namespace FPSController
         // Ground check (single source of truth)
         private bool _isGrounded;
         private bool _wasGroundedLastFrame;
-        private float _slopeAngle;
 
         // Coyote time & jump buffer
         private float _coyoteTimer;
@@ -41,7 +40,6 @@ namespace FPSController
         private const float FOV_LERP_SPEED = 10f;
         private const float GROUND_CHECK_DISTANCE = 0.3f;
         private const float GROUND_CHECK_OFFSET = 0.1f;
-        private const float SLOPE_REDUCTION_START = 20f;
 
         private bool _gravityOverride;
         private bool _movementEnabled = true;
@@ -91,15 +89,9 @@ namespace FPSController
             Vector3 origin = transform.position + Vector3.up * (radius + GROUND_CHECK_OFFSET);
 
             if (Physics.SphereCast(origin, radius, Vector3.down, out RaycastHit hit, GROUND_CHECK_OFFSET + GROUND_CHECK_DISTANCE))
-            {
                 _isGrounded = true;
-                _slopeAngle = Vector3.Angle(Vector3.up, hit.normal);
-            }
             else
-            {
                 _isGrounded = false;
-                _slopeAngle = 0f;
-            }
 
             // Landing event
             if (_isGrounded && !_wasGroundedLastFrame)
@@ -138,13 +130,6 @@ namespace FPSController
 
             float speedMultiplier = _isGrounded ? 1f : _Settings.AirControlMultiplier;
 
-            // Gradual speed reduction on steep slopes
-            if (_isGrounded && _slopeAngle > SLOPE_REDUCTION_START)
-            {
-                float slopeFactor = Mathf.InverseLerp(SLOPE_REDUCTION_START, _CharacterController.slopeLimit, _slopeAngle);
-                speedMultiplier *= Mathf.Lerp(1f, 0.3f, slopeFactor);
-            }
-
             _targetHorizontalVelocity = direction * (p_speed * speedMultiplier);
         }
 
@@ -175,6 +160,11 @@ namespace FPSController
         public CharacterController GetCharacterController()
         {
             return _CharacterController;
+        }
+
+        public void SetHeadBobEnabled(bool p_enabled)
+        {
+            _HeadBob.enabled = p_enabled;
         }
 
         /// <summary>
@@ -215,9 +205,20 @@ namespace FPSController
                 return;
 
             if (_isGrounded && _verticalVelocity < 0f)
+            {
                 _verticalVelocity = -1f;
+            }
             else
-                _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+            {
+                float gravityScale = 1f;
+
+                if (_verticalVelocity < 0f)
+                    gravityScale = _Settings.FallGravityMultiplier;
+                else if (_verticalVelocity > 0f && !_InputHandler.JumpPressed)
+                    gravityScale = _Settings.LowJumpGravityMultiplier;
+
+                _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
+            }
 
             bool canJump = _jumpEnabled && _jumpBufferTimer > 0f && _coyoteTimer > 0f;
             if (canJump)
@@ -289,9 +290,5 @@ namespace FPSController
             );
         }
 
-        public void SetHeadBobEnabled(bool p_enabled)
-        {
-            _HeadBob.enabled = p_enabled;
-        }
     }
 }
