@@ -189,7 +189,11 @@ namespace FPSController
         {
             _gravityOverrideRequested = p_override;
             _gravityOverride = p_override;
-            if (p_override) _verticalVelocity = 0f;
+            if (p_override)
+            {
+                _verticalVelocity = 0f;
+                _currentHorizontalVelocity = Vector3.zero;
+            }
         }
 
         public void SetVerticalVelocity(float p_velocity)
