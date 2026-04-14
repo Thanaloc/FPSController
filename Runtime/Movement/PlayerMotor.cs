@@ -129,7 +129,7 @@ namespace FPSController
 
             Vector3 direction = transform.right * p_input.x + transform.forward * p_input.y;
 
-            if (_coyoteTimer > 0f)
+            if (_coyoteTimer > 0f || _gravityOverride)
             {
                 _targetHorizontalVelocity = direction * p_speed;
             }
@@ -282,7 +282,7 @@ namespace FPSController
 
             _CharacterController.Move(finalMove * Time.deltaTime);
 
-            _targetHorizontalVelocity = _isGrounded ? Vector3.zero : _currentHorizontalVelocity;
+            _targetHorizontalVelocity = (_isGrounded || _gravityOverride) ? Vector3.zero : _currentHorizontalVelocity;
         }
 
         //Camera
