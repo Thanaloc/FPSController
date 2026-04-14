@@ -210,12 +210,7 @@ namespace FPSController
             }
             else
             {
-                float gravityScale = 1f;
-
-                if (_verticalVelocity < 0f)
-                    gravityScale = _Settings.FallGravityMultiplier;
-                else if (_verticalVelocity > 0f && !_InputHandler.JumpPressed)
-                    gravityScale = _Settings.LowJumpGravityMultiplier;
+                float gravityScale = _verticalVelocity < 0f ? _Settings.FallGravityMultiplier : 1f;
 
                 _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
             }
