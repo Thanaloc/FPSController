@@ -288,5 +288,10 @@ namespace FPSController
                 FOV_LERP_SPEED * Time.deltaTime
             );
         }
+
+        public void SetHeadBobEnabled(bool p_enabled)
+        {
+            _HeadBob.enabled = p_enabled;
+        }
     }
 }
