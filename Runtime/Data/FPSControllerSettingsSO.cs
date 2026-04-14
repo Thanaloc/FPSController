@@ -22,5 +22,11 @@ namespace FPSController
         [Header("Gravity")]
         [Tooltip("Gravity multiplier while falling. Higher = snappier descent.")]
         public float FallGravityMultiplier = 2.2f;
+
+        [Tooltip("Vertical speed below which apex gravity kicks in.")]
+        public float ApexThreshold = 2.5f;
+
+        [Tooltip("Gravity multiplier in the apex zone. Higher = snappier peak.")]
+        public float ApexGravityMultiplier = 3f;
     }
 }

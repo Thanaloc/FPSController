@@ -44,6 +44,7 @@ namespace FPSController
         private bool _gravityOverride;
         private bool _movementEnabled = true;
         private bool _jumpEnabled = true;
+        private bool _gravityOverrideRequested;
 
         /// <summary>
         /// True if the player is on the ground. Single source of truth (SphereCast).
@@ -128,9 +129,21 @@ namespace FPSController
 
             Vector3 direction = transform.right * p_input.x + transform.forward * p_input.y;
 
-            float speedMultiplier = _coyoteTimer > 0f ? 1f : _Settings.AirControlMultiplier;
+            if (_coyoteTimer > 0f)
+            {
+                _targetHorizontalVelocity = direction * p_speed;
+            }
+            else
+            {
+                // Airborne: preserve momentum, input nudges direction
+                Vector3 wish = _currentHorizontalVelocity
+                              + direction * (p_speed * _Settings.AirControlMultiplier);
 
-            _targetHorizontalVelocity = direction * (p_speed * speedMultiplier);
+                if (wish.sqrMagnitude > p_speed * p_speed)
+                    wish = wish.normalized * p_speed;
+
+                _targetHorizontalVelocity = wish;
+            }
         }
 
         public void SetMovementSmoothing(float p_acceleration, float p_deceleration)
@@ -174,6 +187,7 @@ namespace FPSController
         /// </summary>
         public void SetGravityOverride(bool p_override)
         {
+            _gravityOverrideRequested = p_override;
             _gravityOverride = p_override;
             if (p_override) _verticalVelocity = 0f;
         }
@@ -201,20 +215,7 @@ namespace FPSController
         {
             _previousVerticalVelocity = _verticalVelocity;
 
-            if (_gravityOverride)
-                return;
-
-            if (_isGrounded && _verticalVelocity < 0f)
-            {
-                _verticalVelocity = -5f;
-            }
-            else
-            {
-                float gravityScale = _verticalVelocity < 0f ? _Settings.FallGravityMultiplier : 1f;
-
-                _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
-            }
-
+            // Jump check first — works even with gravity override (ship, etc.)
             bool canJump = _jumpEnabled && _jumpBufferTimer > 0f && _coyoteTimer > 0f;
             if (canJump)
             {
@@ -222,6 +223,32 @@ namespace FPSController
                 _coyoteTimer = 0f;
                 _jumpBufferTimer = 0f;
                 _InputHandler.ConsumeJump();
+                _gravityOverride = false; // Lift override for the jump arc
+            }
+
+            if (_gravityOverride)
+                return;
+
+            if (_isGrounded && _verticalVelocity < 0f)
+            {
+                _verticalVelocity = -2f;
+
+                // Restore override on landing if game code requested it
+                if (_gravityOverrideRequested)
+                    _gravityOverride = true;
+            }
+            else
+            {
+                float gravityScale;
+
+                if (_verticalVelocity < 0f)
+                    gravityScale = _Settings.FallGravityMultiplier;
+                else if (_verticalVelocity < _Settings.ApexThreshold)
+                    gravityScale = _Settings.ApexGravityMultiplier;
+                else
+                    gravityScale = 1f;
+
+                _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
             }
         }
 
@@ -251,8 +278,7 @@ namespace FPSController
 
             _CharacterController.Move(finalMove * Time.deltaTime);
 
-            // Reset target: if no state calls Move() next frame, we decelerate to zero
-            _targetHorizontalVelocity = Vector3.zero;
+            _targetHorizontalVelocity = _isGrounded ? Vector3.zero : _currentHorizontalVelocity;
         }
 
         //Camera
