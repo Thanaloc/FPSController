@@ -9,25 +9,30 @@ namespace FPSController
             p_stateMachine.Motor.SetSprintFOV(true);
             p_stateMachine.Motor.SetColliderHeight(_data.ColliderHeight);
             p_stateMachine.Motor.SetCameraHeight(_data.CameraHeight);
+            p_stateMachine.Motor.SetMovementSmoothing(_data.Acceleration, _data.Deceleration);
         }
 
         public override void Execute(PlayerStateMachine p_stateMachine)
         {
-            if (!p_stateMachine.Input.SprintPressed && p_stateMachine.Input.MoveInput.sqrMagnitude == 0)
+            bool hasInput = p_stateMachine.Input.MoveInput.sqrMagnitude > 0.1f;
+            bool movingForward = p_stateMachine.Input.MoveInput.y > 0.5f;
+
+            // Exit sprint if no longer moving forward
+            if (!movingForward || !p_stateMachine.Input.SprintPressed)
             {
+                if (p_stateMachine.Input.CrouchPressed)
+                {
+                    p_stateMachine.TransitionTo(p_stateMachine.CrouchState);
+                    return;
+                }
+
+                if (hasInput)
+                {
+                    p_stateMachine.TransitionTo(p_stateMachine.WalkState);
+                    return;
+                }
+
                 p_stateMachine.TransitionTo(p_stateMachine.IdleState);
-                return;
-            }
-
-            if (!p_stateMachine.Input.SprintPressed && p_stateMachine.Input.CrouchPressed)
-            {
-                p_stateMachine.TransitionTo(p_stateMachine.CrouchState);
-                return;
-            }
-
-            if (!p_stateMachine.Input.SprintPressed && p_stateMachine.Input.MoveInput.sqrMagnitude > 0.1f)
-            {
-                p_stateMachine.TransitionTo(p_stateMachine.WalkState);
                 return;
             }
 
