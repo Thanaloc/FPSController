@@ -135,6 +135,7 @@ namespace FPSController
                 }
 
                 _direction.y = _verticalVelocity;
+                Debug.Log($"[Motor] grounded={grounded} vVel={_verticalVelocity:F3} dirY={_direction.y:F3}");
                 return;
             }
 
