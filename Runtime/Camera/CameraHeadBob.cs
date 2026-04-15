@@ -26,6 +26,11 @@ namespace FPSController
             _StateMachine.OnStateChanged -= OnStateChanged;
         }
 
+        private void Start()
+        {
+            OnStateChanged(_StateMachine.CurrentState);
+        }
+
         private void Update()
         {
             if (_CharacterController.velocity.sqrMagnitude > 0.1f)

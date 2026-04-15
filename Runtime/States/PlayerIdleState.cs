@@ -8,7 +8,6 @@ namespace FPSController
         {
             p_stateMachine.Motor.SetColliderHeight(_data.ColliderHeight);
             p_stateMachine.Motor.SetCameraHeight(_data.CameraHeight);
-            p_stateMachine.Motor.SetMovementSmoothing(_data.Acceleration, _data.Deceleration);
         }
 
         public override void Execute(PlayerStateMachine p_stateMachine)
@@ -19,9 +18,7 @@ namespace FPSController
                 return;
             }
 
-            if (p_stateMachine.Input.SprintPressed
-                && p_stateMachine.Input.MoveInput.sqrMagnitude > 0.1f
-                && p_stateMachine.Input.MoveInput.y > 0.5f)
+            if (p_stateMachine.Input.SprintPressed)
             {
                 p_stateMachine.TransitionTo(p_stateMachine.SprintState);
                 return;

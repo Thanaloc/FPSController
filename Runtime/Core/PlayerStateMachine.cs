@@ -43,14 +43,6 @@ namespace FPSController
             _currentState.Enter(this);
         }
 
-        /// <summary>
-        /// Emitted in Start so all subscribers (who register in OnEnable) are guaranteed to receive it.
-        /// </summary>
-        private void Start()
-        {
-            OnStateChanged?.Invoke(_currentState);
-        }
-
         private void Update()
         {
             _currentState.Execute(this);
