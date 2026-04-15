@@ -135,14 +135,24 @@ namespace FPSController
                 }
 
                 _direction.y = _verticalVelocity;
-                Debug.Log($"[Motor] grounded={grounded} vVel={_verticalVelocity:F3} dirY={_direction.y:F3}");
                 return;
             }
 
             if (grounded && _verticalVelocity < 0)
                 _verticalVelocity = -1f;
             else
-                _verticalVelocity += Physics.gravity.y * Time.deltaTime;
+            {
+                float gravityScale;
+
+                if (_verticalVelocity < 0f)
+                    gravityScale = _Settings.FallGravityMultiplier;
+                else if (_verticalVelocity < _Settings.ApexThreshold)
+                    gravityScale = _Settings.ApexGravityMultiplier;
+                else
+                    gravityScale = 1f;
+
+                _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
+            }
 
             if (_jumpEnabled && _InputHandler.JumpPressed && grounded)
 
