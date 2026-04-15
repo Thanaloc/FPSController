@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace FPSController
@@ -117,6 +118,8 @@ namespace FPSController
 
         private void ApplyGravity()
         {
+            Debug.Log($"[Gravity] grounded={CheckGrounded()} gravEnabled={_gravityEnabled} jumping={_isJumping} vVel={_verticalVelocity:F2}");
+
             bool grounded = CheckGrounded();
             bool onManagedSurface = !_gravityEnabled && !_isJumping;
 
