@@ -9,6 +9,7 @@ namespace FPSController
             p_stateMachine.Motor.SetSprintFOV(true);
             p_stateMachine.Motor.SetColliderHeight(_data.ColliderHeight);
             p_stateMachine.Motor.SetCameraHeight(_data.CameraHeight);
+            p_stateMachine.Motor.SetMovementSmoothing(_data.Acceleration, _data.Deceleration);
         }
 
         public override void Execute(PlayerStateMachine p_stateMachine)

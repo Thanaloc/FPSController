@@ -20,6 +20,10 @@ namespace FPSController
         private float _targetFOV;
         private float _defaultFOV;
 
+        private Vector3 _currentHorizontalVelocity;
+        private float _currentAcceleration = 50f;
+        private float _currentDeceleration = 40f;
+
         private const float CAMERA_LERP_SPEED = 10f;
         private const float FOV_LERP_SPEED = 10f;
 
@@ -43,6 +47,12 @@ namespace FPSController
             ApplyMovement();
         }
 
+        public void SetMovementSmoothing(float p_acceleration, float p_deceleration)
+        {
+            _currentAcceleration = p_acceleration;
+            _currentDeceleration = p_deceleration;
+        }
+
         public void Move(Vector2 p_input, float p_speed)
         {
             if (!_movementEnabled)
@@ -52,9 +62,21 @@ namespace FPSController
                 return;
             }
 
-            _direction = transform.right * p_input.x + transform.forward * p_input.y;
-            _direction.x *= p_speed;
-            _direction.z *= p_speed;
+            Vector3 target = transform.right * p_input.x + transform.forward * p_input.y;
+            target *= p_speed;
+
+            float rate = target.sqrMagnitude >= _currentHorizontalVelocity.sqrMagnitude
+                ? _currentAcceleration
+                : _currentDeceleration;
+
+            _currentHorizontalVelocity = Vector3.MoveTowards(
+                _currentHorizontalVelocity,
+                target,
+                rate * Time.deltaTime
+            );
+
+            _direction.x = _currentHorizontalVelocity.x;
+            _direction.z = _currentHorizontalVelocity.z;
         }
 
         public void SetColliderHeight(float p_height)
@@ -160,7 +182,16 @@ namespace FPSController
                 return;
 
             _CharacterController.Move(_direction * Time.deltaTime);
-            _direction.x = _direction.z = 0f;
+
+            float rate = _currentDeceleration;
+            _currentHorizontalVelocity = Vector3.MoveTowards(
+                _currentHorizontalVelocity,
+                Vector3.zero,
+                rate * Time.deltaTime
+            );
+
+            _direction.x = _currentHorizontalVelocity.x;
+            _direction.z = _currentHorizontalVelocity.z;
         }
 
         private void ApplyCameraHeight()

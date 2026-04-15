@@ -13,5 +13,9 @@ namespace FPSController
         public float CameraHeight = 1.6f;
         public float BobFrequency;
         public float BobAmplitude;
+
+        [Header("Smoothing")]
+        public float Acceleration = 50f;
+        public float Deceleration = 40f;
     }
 }
