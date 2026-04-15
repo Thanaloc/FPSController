@@ -25,6 +25,7 @@ namespace FPSController
         private bool _gravityEnabled = true;
         private bool _movementEnabled = true;
         private bool _jumpEnabled = true;
+        private bool _isJumping = false;
 
         private void Awake()
         {
@@ -117,15 +118,19 @@ namespace FPSController
         private void ApplyGravity()
         {
             bool grounded = CheckGrounded();
-            bool onManagedSurface = !_gravityEnabled && _verticalVelocity <= 0f;
+            bool onManagedSurface = !_gravityEnabled && !_isJumping;
 
-            if (_jumpEnabled && _InputHandler.JumpPressed && (grounded || onManagedSurface))
+            if (_isJumping && (grounded || (onManagedSurface && _verticalVelocity <= 0f)))
+                _isJumping = false;
+
+            if (_jumpEnabled && _InputHandler.JumpPressed && (grounded || (!_gravityEnabled && _verticalVelocity <= 0f)))
             {
                 _verticalVelocity = _Settings.JumpForce;
+                _isJumping = true;
                 _InputHandler.ConsumeJump();
             }
 
-            if ((grounded || onManagedSurface) && _verticalVelocity <= 0f)
+            if (!_isJumping && (grounded || !_gravityEnabled) && _verticalVelocity <= 0f)
             {
                 _verticalVelocity = -1f;
             }
