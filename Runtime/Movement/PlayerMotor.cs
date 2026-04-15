@@ -120,19 +120,16 @@ namespace FPSController
 
             if (!_gravityEnabled)
             {
-                if (_jumpEnabled && _InputHandler.JumpPressed && grounded)
+                if (_jumpEnabled && _InputHandler.JumpPressed && _verticalVelocity <= 0f)
                 {
                     _verticalVelocity = _Settings.JumpForce;
                     _InputHandler.ConsumeJump();
                 }
 
-                if (_verticalVelocity != 0f)
-                {
+                if (_verticalVelocity > 0f)
                     _verticalVelocity += Physics.gravity.y * Time.deltaTime;
-
-                    if (grounded && _verticalVelocity < 0f)
-                        _verticalVelocity = 0f;
-                }
+                else
+                    _verticalVelocity = -1f;
 
                 _direction.y = _verticalVelocity;
                 return;
