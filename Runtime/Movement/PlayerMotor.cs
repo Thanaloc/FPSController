@@ -118,21 +118,17 @@ namespace FPSController
 
         private void ApplyGravity()
         {
-            UnityEngine.Debug.Log($"[Gravity] grounded={CheckGrounded()} gravEnabled={_gravityEnabled} jumping={_isJumping} vVel={_verticalVelocity:F2}");
-
             bool grounded = CheckGrounded();
-            bool onManagedSurface = !_gravityEnabled && !_isJumping;
 
-            if (_isJumping && (grounded || (onManagedSurface && _verticalVelocity <= 0f)))
-                _isJumping = false;
-
-            if (_jumpEnabled && _InputHandler.JumpPressed && (grounded || (!_gravityEnabled && _verticalVelocity <= 0f)))
+            // Jump
+            if (_jumpEnabled && _InputHandler.JumpPressed && (grounded || (!_gravityEnabled && !_isJumping)))
             {
                 _verticalVelocity = _Settings.JumpForce;
                 _isJumping = true;
                 _InputHandler.ConsumeJump();
             }
 
+            // Gravity
             if (!_isJumping && (grounded || !_gravityEnabled) && _verticalVelocity <= 0f)
             {
                 _verticalVelocity = -1f;
@@ -150,6 +146,10 @@ namespace FPSController
 
                 _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
             }
+
+            // Landing check — AFTER gravity so jump frame can't self-cancel
+            if (_isJumping && _verticalVelocity <= 0f && (grounded || _CharacterController.isGrounded))
+                _isJumping = false;
 
             _direction.y = _verticalVelocity;
         }
