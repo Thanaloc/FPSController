@@ -117,26 +117,18 @@ namespace FPSController
         private void ApplyGravity()
         {
             bool grounded = CheckGrounded();
+            bool onManagedSurface = !_gravityEnabled && _verticalVelocity <= 0f;
 
-            if (!_gravityEnabled)
+            if (_jumpEnabled && _InputHandler.JumpPressed && (grounded || onManagedSurface))
             {
-                if (_jumpEnabled && _InputHandler.JumpPressed && _verticalVelocity <= 0f)
-                {
-                    _verticalVelocity = _Settings.JumpForce;
-                    _InputHandler.ConsumeJump();
-                }
-
-                if (_verticalVelocity > 0f)
-                    _verticalVelocity += Physics.gravity.y * Time.deltaTime;
-                else
-                    _verticalVelocity = -1f;
-
-                _direction.y = _verticalVelocity;
-                return;
+                _verticalVelocity = _Settings.JumpForce;
+                _InputHandler.ConsumeJump();
             }
 
-            if (grounded && _verticalVelocity < 0)
+            if ((grounded || onManagedSurface) && _verticalVelocity <= 0f)
+            {
                 _verticalVelocity = -1f;
+            }
             else
             {
                 float gravityScale;
@@ -149,15 +141,6 @@ namespace FPSController
                     gravityScale = 1f;
 
                 _verticalVelocity += Physics.gravity.y * gravityScale * Time.deltaTime;
-            }
-
-            if (_jumpEnabled && _InputHandler.JumpPressed && grounded)
-
-            {
-                _verticalVelocity = _Settings.JumpForce;
-
-
-                _InputHandler.ConsumeJump();
             }
 
             _direction.y = _verticalVelocity;
